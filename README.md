@@ -1,2 +1,2 @@
 # Alarm-Clock
-Alarm Clock Code &amp; Schematic
+Alarm Clock Code &amp; Circuit
