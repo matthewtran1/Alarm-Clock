@@ -1,0 +1,297 @@
+#include <LiquidCrystal.h>
+
+int hours = 0;
+int minutes = 0;
+int seconds = 0;
+int startStop = 0;
+
+int setSecond = 0;
+int setMin = 0;
+int setHr = 0;
+int setAlarm = 0; //Only changes the seconds
+int secondAlarm = 0;
+int alarmMin = 0;
+int alarmHr = 0;
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  lcd.begin(16,2);
+  pinMode(10,OUTPUT);
+  
+  //Buzzer 
+  pinMode(13, OUTPUT);
+
+  
+  //Sets the 5 buttons
+  pinMode(6, INPUT); //b1
+  pinMode(7, INPUT); //b2
+  pinMode(8, INPUT); //b3
+  pinMode(9, INPUT); //b4
+  pinMode(0, INPUT); //b5
+  pinMode(1, INPUT); //Alarm switch
+  digitalWrite(6, HIGH);
+  digitalWrite(7, HIGH);
+  digitalWrite(8, HIGH);
+  digitalWrite(9, HIGH);
+  digitalWrite(0, HIGH);
+  digitalWrite(1, HIGH);
+
+  
+  pinMode(A0,INPUT); //Brightness adjustment
+  
+  //Sets the beginning time set-up for the clock
+  lcd.setCursor(0,0); 
+  lcd.print(0);
+  lcd.setCursor(1,0); 
+  lcd.print(0);
+  lcd.setCursor(2,0); 
+  lcd.print(":");
+  lcd.setCursor(3,0);
+  lcd.print(0);
+  lcd.setCursor(4,0); 
+  lcd.print(0);
+  lcd.setCursor(5,0);
+  lcd.print(":");
+  lcd.setCursor(6,0);
+  lcd.print(0);
+  lcd.setCursor(7,0);
+  lcd.print(0);
+  
+  
+  }
+
+void loop() {
+  digitalWrite(10,!analogRead(A0));
+
+  //Start/Stop button (Second left)
+  
+  if (digitalRead(1) == LOW) {
+    lcd.setCursor(0,1);
+    lcd.print("Time              ");
+    
+}
+    if (digitalRead(9) == LOW) {
+          delay(500);
+          startStop++;
+      }
+
+    //Checks to see if the start was pressed
+    if (startStop/2 != 0){
+      seconds++;
+    }
+
+          //Once 59 seconds is reached, the seconds are reseted
+          if(seconds == 60){
+              lcd.setCursor(6,0);
+              lcd.print(0);
+              seconds = 0;
+              minutes++;
+          }
+          //Once 59 minutes is reached, the minutes are reseted
+          if(minutes == 60){
+              lcd.setCursor(3,0);
+              lcd.print(0);
+              minutes = 0;
+              hours++;
+          }
+          //Once 23 hours is reached, the hours are reseted 
+          if(hours == 24){
+              lcd.setCursor(0,0);
+              lcd.print(0);
+              hours = 0;
+          }
+          //Moves the hours position once it goes to double digits
+          if(hours >= 10){
+            lcd.setCursor(0,0);
+            lcd.print(hours);
+          }else{
+            lcd.setCursor(0,0);
+            lcd.print(0);
+            lcd.setCursor(1,0);
+            lcd.print(hours);
+          }
+          //Moves the minutes position once it goes to double digits
+          if(minutes >= 10){
+            lcd.setCursor(3,0);
+            lcd.print(minutes);
+          }else{
+            lcd.setCursor(3,0);
+            lcd.print(0);
+            lcd.setCursor(4,0);
+            lcd.print(minutes);
+          }
+          //Moves the seconds position once it goes to double digits
+          if(seconds >= 10){
+            lcd.setCursor(6,0);
+            lcd.print(seconds);
+          }else{
+            lcd.setCursor(6,0);
+            lcd.print(0);
+            lcd.setCursor(7,0);
+            lcd.print(seconds);
+          }
+          //Button 1 will increment the seconds by 1 second (Far right)
+          setSecond = digitalRead(6);
+          if (setSecond == LOW) {
+            delay(50);
+            seconds++;
+          }    
+          //Button 2 will increment the minutess by 1 minute (Second right)
+          setMin = digitalRead(7);
+          if (setMin == LOW) {
+            delay(50);
+            minutes++;
+          }    
+          //Button 3 will increment the hours by 1 hour (Middle)
+          setHr = digitalRead(8);
+          if (setHr == LOW) {
+            delay(50);
+            hours++;
+          }
+
+  
+  //Slide switch to switch between alarm time and clock time
+	while (digitalRead(1) == HIGH){
+   
+  	digitalWrite(10,!analogRead(A0));
+  	lcd.setCursor(0,1);
+  	lcd.print("Set Alarm");
+   
+      
+    //Adjusts for the inputed alarm
+         //Once 59 seconds is reached, the seconds are reseted
+         if(secondAlarm == 60){
+              lcd.setCursor(6,0);
+              lcd.print(0);
+              secondAlarm = 0;
+              alarmMin++;
+          }
+          //Once 59 minutes is reached, the minutes are reseted
+          if(alarmMin == 60){
+              lcd.setCursor(3,0);
+              lcd.print(0);
+              alarmMin = 0;
+              alarmHr++;
+          }
+          //Once 23 hours is reached, the hours are reseted 
+          if(alarmHr == 24){
+              lcd.setCursor(0,0);
+              lcd.print(0);
+              alarmHr = 0;
+          }
+      		
+          //Fixes the position for hours when it passes 10
+          if(alarmHr >= 10){
+            lcd.setCursor(0,0);
+            lcd.print(alarmHr);
+          }else{
+            lcd.setCursor(0,0);
+            lcd.print(0);
+            lcd.setCursor(1,0);
+            lcd.print(alarmHr);
+          }
+      
+      	  //Fixes the position for minutes when it passes 10
+          if(alarmMin >= 10){
+            lcd.setCursor(3,0);
+            lcd.print(alarmMin);
+          }else{
+            lcd.setCursor(3,0);
+            lcd.print(0);
+            lcd.setCursor(4,0);
+            lcd.print(alarmMin);
+          }
+      
+		  //Fixes the position for seconds when it passes 10	
+      	  if(secondAlarm >= 10){
+            lcd.setCursor(6,0);
+            lcd.print(secondAlarm);
+          }else{
+            lcd.setCursor(6,0);
+            lcd.print(0);
+            lcd.setCursor(7,0);
+            lcd.print(secondAlarm);
+          }
+      
+      
+      
+      //Button used to set the alarm
+      setAlarm = digitalRead(0);
+          if (setAlarm == LOW) {
+            delay(100);
+            secondAlarm++;
+          }
+    }
+  
+    //If alarm time and clock time match, it will buzz
+  if((alarmHr == hours) && (alarmMin == minutes) && (secondAlarm == seconds) && secondAlarm !=0) 
+    {
+    //Set the alarm constantly active until it is terminated
+    delay(1000);
+    while(digitalRead(0) == HIGH){
+      tone(13, 1000, 500); //output pin, pitch in hz, length of sound in ms
+      delay(100);
+      noTone(13);
+      delay(100);
+      seconds++;
+
+          //Once 59 seconds is reached, the seconds are reseted
+          if(seconds == 60){
+              lcd.setCursor(6,0);
+              lcd.print(0);
+              seconds = 0;
+              minutes++;
+          }
+          //Once 59 minutes is reached, the minutes are reseted
+          if(minutes == 60){
+              lcd.setCursor(3,0);
+              lcd.print(0);
+              minutes = 0;
+              hours++;
+          }
+          //Once 23 hours is reached, the hours are reseted 
+          if(hours == 24){
+              lcd.setCursor(0,0);
+              lcd.print(0);
+              hours = 0;
+          }
+          //Moves the hours position once it goes to double digits
+          if(hours >= 10){
+            lcd.setCursor(0,0);
+            lcd.print(hours);
+          }else{
+            lcd.setCursor(0,0);
+            lcd.print(0);
+            lcd.setCursor(1,0);
+            lcd.print(hours);
+          }
+          //Moves the minutes position once it goes to double digits
+          if(minutes >= 10){
+            lcd.setCursor(3,0);
+            lcd.print(minutes);
+          }else{
+            lcd.setCursor(3,0);
+            lcd.print(0);
+            lcd.setCursor(4,0);
+            lcd.print(minutes);
+          }
+          //Moves the seconds position once it goes to double digits
+          if(seconds >= 10){
+            lcd.setCursor(6,0);
+            lcd.print(seconds);
+          }else{
+            lcd.setCursor(6,0);
+            lcd.print(0);
+            lcd.setCursor(7,0);
+            lcd.print(seconds);
+          }
+      delay(1000);
+    }
+    //Once the loop is exited, the alarm is reseted(disable for alarm) 
+    secondAlarm = 0;
+    alarmMin = 0;
+    alarmHr = 0;
+    }  
+  delay(0.016);
+}
